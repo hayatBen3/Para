@@ -1,0 +1,206 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes commandes
+{% endblock %}
+{% block stylesheets %}
+	{{parent()}}
+	<style>
+
+		.card {
+			border: 1px solid #e0e0e0;
+			border-radius: 10px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+
+		.card-title {
+			color: #333;
+			font-size: 1.2rem;
+			font-weight: bold;
+		}
+
+		.card-text {
+			color: #666;
+		}
+
+		.btn {
+			border-radius: 20px;
+			padding: 8px 16px;
+			font-size: 0.9rem;
+			font-weight: bold;
+		}
+
+		.btn-success {
+			background-color: #27c58f;
+			border-color: #b4dc6d;
+			color: white;
+		}
+
+		.btn-info {
+			background-color: #17a2b8;
+			border-color: #17a2b8;
+			color: white;
+		}
+
+
+		.card-title,
+		.card-text {
+			font-family: 'Arial', sans-serif;
+			font-size: 16px; /* Adjust the font size as needed */
+			color: #333; /* Adjust the font color as needed */
+		}
+
+		/* Reduce space between paragraphs */
+		.card-text {
+			margin-bottom: 8px; /* Adjust the margin as needed */
+		}
+
+		/* Keyframes for fadeInLeft animation */
+		@keyframes fadeInLeft {
+			from {
+				opacity: 0;
+				transform: translate3d(-100%, 0, 0);
+			}
+
+			to {
+				opacity: 1;
+				transform: translate3d(0, 0, 0);
+			}
+		}
+
+		/* Apply fadeInLeft animation */
+		.animate__fadeInLeft {
+			animation: fadeInLeft 1s both;
+		}
+
+
+		.card-title,
+		.card-text {
+			font-family: 'Arial', sans-serif;
+			font-size: 16px; /* Adjust the font size as needed */
+			color: #333; /* Adjust the font color as needed */
+		}
+
+		/* Reduce space between paragraphs */
+		.card-text {
+			margin-bottom: 4px; /* Adjust the margin as needed */
+		}
+
+		.pTotal {
+			margin-top: auto; /* Align the "Total" paragraph to the bottom */
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid page-header py-5">
+		<h1 class="text-center text-white display-6">Mes commandes</h1>
+		<ol class="breadcrumb justify-content-center mb-0">
+			<li class="breadcrumb-item">
+				<a href="#">Home</a>
+			</li>
+			<li class="breadcrumb-item">
+				<a href="#">Pages</a>
+			</li>
+			<li class="breadcrumb-item active text-white">Details</li>
+		</ol>
+	</div>
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-lg-7 col-md-10 col-sm-12">
+				<div class="card shadow">
+					<div class="card-body">
+						<h5 class="card-title text-center">Order Details</h5>
+						<hr>
+						<div class="row mb-3">
+							<div class="col-md-6">
+								<p class="mb-1">
+									<strong>Reference:</strong>
+									{{ order.reference }}</p>
+								<p class="mb-1">
+									<strong>Created At:</strong>
+									{{ order.createdAt|date("Y-m-d H:i A") }}</p>
+								<p class="mb-1">
+									<strong>Phone:</strong>
+									{{ order.phone }}</p>
+							</div>
+							<div class="col-md-6">
+								<p class="mb-1">
+									<strong>Full Name:</strong>
+									{{ order.firstName }}
+									{{ order.lastName }}</p>
+								<p class="mb-1">
+									<strong>Address:</strong>
+									{{ order.address }}</p>
+								<p class="mb-1">
+									<strong>Total:</strong>
+									${{ order.total }}</p>
+							</div>
+						</div>
+						<div class="text-center">
+
+							{% set dateNow = date() %}
+							{% if order.isPaidByCard  %}
+								<span class="btn btn-success">Paid</span>
+								<a href="{{ path('my_orders')}}" class="btn btn-outline-secondary ml-2">Return</a>
+							{% elseif order.isPaidByCard != true  and date(dateNow)|date_modify('-1 day') > order.createdAt %}
+								<small>Your order has expired. Please go to the shop to place another order.</small><br><br>
+								<a class="btn btn-warning" href="{{ path('products_index')}}">Go to Shop</a>
+								<a href="{{ path('my_orders')}}" class="btn btn-outline-secondary ml-2">Return</a>
+							{% else %}
+								<a class="btn btn-info" href="{{ path('process_payment', {'id': order.getId()} ) }}">Waiting payment</a>
+							{% endif %}
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-md-12 col-lg-5 col-xl-5">
+				<div class="table-responsive">
+					<table class="table ">
+						<thead>
+							<tr>
+								<th scope="col">Products</th>
+								<th scope="col">Name</th>
+								<th scope="col">Price</th>
+								<th scope="col">Quantity</th>
+								<th scope="col">Total</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% set initialTotal = 0 %}
+							{% for element in order.orderDetails %}
+								<tr>
+									<td data-label="Products">
+										<div class="d-flex align-items-center mt-2">
+											<img src="{{asset('front/img/')}}{{element.products.picture }}" class="img-fluid rounded-circle" style="width: 90px; height: 90px;" alt="">
+										</div>
+									</td>
+									<td data-label="Name" class="py-5">{{element.products.name}}</td>
+									<td data-label="Price" class="py-5">${{element.products.price}}</td>
+									<td data-label="Quantity" class="py-5">{{element.quantity}}</td>
+									<td data-label="Total" class="py-5">${{element.products.price * element.quantity}}</td>
+									{% set initialTotal = initialTotal + (element.products.price * element.quantity)%}
+								</tr>
+							{% endfor %}
+
+							<tr>
+								<td colspan="3" class="py-2" align="right">
+									<p class="mb-0 text-dark text-uppercase py-3">TOTAL :
+									</p>
+								</td>
+								<td colspan="3" class="py-4">
+									<p class="mb-0 text-dark">
+										<b>${{initialTotal}}</b>
+									</p>
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+
+		</div>
+	</div>
+
+
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Ajouter une commande
+{% endblock %}
+{% block stylesheets %}
+	{{parent()}}
+	<style>
+		.div-page-register {
+			padding-top: 3%;
+		}
+		.row-register-client .col-lg-6 {
+			padding: 10px;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+
+
+	<!-- Single Page Header start -->
+	<div class="container-fluid page-header py-5">
+		<h1 class="text-center text-white display-6">Checkout</h1>
+		<ol class="breadcrumb justify-content-center mb-0">
+			<li class="breadcrumb-item">
+				<a href="#">Home</a>
+			</li>
+			<li class="breadcrumb-item">
+				<a href="#">Pages</a>
+			</li>
+			<li class="breadcrumb-item active text-white">Checkout</li>
+		</ol>
+	</div>
+	<!-- Single Page Header End -->
+
+
+	<div class="container-fluid py-4">
+
+		<div class="container py-4">
+			<h1 class="mb-4">Valider la commande</h1>
+			<form action="{{ path('add_order') }}" method="POST">
+				<div class="row g-5">
+					<div class="col-md-12 col-lg-6 col-xl-7">
+						<div class="row">
+							<div class="col-md-12 col-lg-6">
+								<div class="form-item w-100">
+									<label class="form-label my-3">First Name<sup>*</sup>
+									</label>
+									<input type="text" class="form-control" name="firstName" required>
+								</div>
+							</div>
+							<div class="col-md-12 col-lg-6">
+								<div class="form-item w-100">
+									<label class="form-label my-3">Last Name<sup>*</sup>
+									</label>
+									<input type="text" class="form-control" name="lastName" required>
+								</div>
+							</div>
+							<div class="col-md-12 col-lg-6">
+								<div class="form-item w-100">
+									<label class="form-label my-3">Phone<sup>*</sup>
+									</label>
+									<input type="text" class="form-control" name="phone" required>
+								</div>
+							</div>
+							<div class="col-md-12 col-lg-6">
+								<div class="form-item w-100">
+									<label class="form-label my-3">Email<sup>*</sup>
+									</label>
+									<input type="email" class="form-control" name="email" required>
+								</div>
+							</div>
+							<div class="col-md-12 col-lg-12">
+								<div class="form-item w-100">
+									<label class="form-label my-3">Address<sup>*</sup>
+									</label>
+									<textarea class="form-control" spellcheck="false" cols="30" rows="5" placeholder="Address" name="address" required></textarea>
+
+								</div>
+							</div>
+						</div>
+
+
+					</div>
+
+					<div class="col-md-12 col-lg-6 col-xl-5">
+						<div class="table-responsive">
+							<table class="table">
+								<thead>
+									<tr>
+										<th scope="col">Products</th>
+										<th scope="col">Name</th>
+										<th scope="col">Price</th>
+										<th scope="col">Quantity</th>
+										<th scope="col">Total</th>
+									</tr>
+								</thead>
+								<tbody>
+
+									{% for element in data %}
+										<tr>
+											<th scope="row">
+												<div class="d-flex align-items-center mt-2">
+													<img src="{{asset('front/img/')}}{{element.product.picture }}" class="img-fluid rounded-circle" style="width: 90px; height: 90px;" alt="">
+												</div>
+											</th>
+											<td class="py-5">{{element.product.name}}</td>
+											<td class="py-5">${{element.product.price}}</td>
+											<td class="py-5">{{element.quantity}}</td>
+											<td class="py-5">${{element.product.price * element.quantity}}</td>
+										</tr>
+									{% endfor %}
+
+									<tr>
+										<th scope="row"></th>
+										<td class="py-1">
+											<p class="mb-0 text-dark py-4">Shipping</p>
+										</td>
+										<td colspan="3" class="py-3">
+											<div class="form-check text-start">
+												<input type="radio" class="form-check-input bg-primary border-0" value="0" checked id="localPickup" name="shipping">
+												<label class="form-check-label" for="Shipping-3">Local Pickup: $0.00</label>
+											</div>
+											<div class="form-check text-start">
+												<input type="radio" class="form-check-input bg-primary border-0" value="1" id="flatRate" name="shipping">
+												<label class="form-check-label" for="Shipping-2">Flat rate: $3.00</label>
+											</div>
+
+
+										</td>
+									</tr>
+									<tr>
+										<td class="py-1">
+											<p class="mb-0 text-dark py-3">Subtotal</p>
+										</td>
+										<td class="py-1">
+											<div class="py-3">
+												<p class="mb-0 text-dark">
+													<b>${{initialTotal}}</b>
+												</p>
+											</div>
+										</td>
+										<td class="py-1">
+											<p class="mb-0 text-dark text-uppercase py-3">Total</p>
+										</td>
+										<td class="py-1">
+											<div class="py-3 ">
+												<p class="mb-0 text-dark">
+													<b>$
+														<span id="spanTotalCalculate">{{initialTotal }}</span>
+													</b>
+												</p>
+											</div>
+										</td>
+
+									</tr>
+								</tbody>
+							</table>
+						</div>
+						<div class="row g-4 text-center align-items-center justify-content-center border-bottom py-3">
+							<div class="col-12">
+								<div class="form-check text-start my-3">
+									<h4 class="form-check-label">Payment Method</h4>
+								</div>
+								<div class="d-flex justify-content-center">
+									<div class="form-check text-start col-lg-6">
+										<input type="radio" class="form-check-input bg-primary border-0" checked value="1" id="PaymentByCard" name="paymentMethod">
+										<label class="form-check-label">Payment by Card</label>
+									</div>
+									<div class="form-check text-start col-lg-6">
+										<input type="radio" class="form-check-input bg-primary border-0" value="0" id="CashOnDelivery" name="paymentMethod">
+										<label class="form-check-label">Cash On Delivery</label>
+									</div>
+
+								</div>
+							</div>
+						</div>
+
+
+						<div class="row g-4 text-center align-items-center justify-content-center pt-4">
+							<button type="submit" class="btn border-secondary py-3 px-4 text-uppercase w-100 text-primary" name="submit_button">Valid order</button>
+						</div>
+					</div>
+
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- Checkout Page End -->
+
+
+{% endblock %}

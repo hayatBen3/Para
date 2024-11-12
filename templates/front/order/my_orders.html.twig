@@ -1,0 +1,191 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mes commandes
+{% endblock %}
+{% block stylesheets %}
+	{{parent()}}
+	<style>
+
+		.card {
+			border: 1px solid #e0e0e0;
+			border-radius: 10px;
+			box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+		}
+
+		.card-title {
+			color: #333;
+			font-size: 1.2rem;
+			font-weight: bold;
+		}
+
+		.card-text {
+			color: #666;
+		}
+
+		.btn {
+			border-radius: 20px;
+			padding: 8px 16px;
+			font-size: 0.9rem;
+			font-weight: bold;
+		}
+
+		.btn-success {
+			background-color: #27c58f;
+			border-color: #b4dc6d;
+			color: white;
+		}
+
+		.btn-info {
+			background-color: #17a2b8;
+			border-color: #17a2b8;
+			color: white;
+		}
+
+
+		.card-title,
+		.card-text {
+			font-size: 14px; /* Adjust the font size as needed */
+			color: #333; /* Adjust the font color as needed */
+		}
+
+		/* Reduce space between paragraphs */
+		.card-text {
+			margin-bottom: 8px; /* Adjust the margin as needed */
+		}
+
+		/* Keyframes for fadeInLeft animation */
+		@keyframes fadeInLeft {
+			from {
+				opacity: 0;
+				transform: translate3d(-100%, 0, 0);
+			}
+
+			to {
+				opacity: 1;
+				transform: translate3d(0, 0, 0);
+			}
+		}
+
+		/* Apply fadeInLeft animation */
+		.animate__fadeInLeft {
+			animation: fadeInLeft 1s both;
+		}
+
+
+		.card-title,
+		.card-text {
+			font-family: 'Arial', sans-serif;
+			font-size: 16px; /* Adjust the font size as needed */
+			color: #333; /* Adjust the font color as needed */
+		}
+
+		/* Reduce space between paragraphs */
+		.card-text {
+			margin-bottom: 4px; /* Adjust the margin as needed */
+		}
+
+		.pTotal {
+			margin-top: auto; /* Align the "Total" paragraph to the bottom */
+		}
+		.card-hover:hover {
+			transform: translateY(-5px);
+			box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+			transition: all 0.3s ease;
+		}
+
+		/* Optional: Add a subtle shadow to the card */
+		.card {
+			transition: all 0.3s ease;
+			box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+		}
+
+
+		/* for pagination  */
+		.current {
+			background-color: var(--bs-primary);
+			color: var(--bs-light);
+			border: 1px solid var(--bs-secondary);
+			padding: 10px 15px;
+			border-radius: 10px !important;
+			font-weight: 800;
+		}
+		.page a,
+		.next a,
+		.last a,
+		.previous a,
+		.first a {
+			color: var(--bs-dark);
+			padding: 10px 16px;
+			text-decoration: none;
+			transition: 0.5s;
+			border: 1px solid var(--bs-secondary);
+			margin: 0 4px;
+			border-radius: 10px !important;
+		}
+	</style>
+{% endblock %}
+
+{% block body %}
+	<div class="container-fluid page-header py-5">
+		<h1 class="text-center text-white display-6">Mes commandes</h1>
+		<ol class="breadcrumb justify-content-center mb-0">
+			<li class="breadcrumb-item">
+				<a href="#">Home</a>
+			</li>
+			<li class="breadcrumb-item">
+				<a href="#">Pages</a>
+			</li>
+			<li class="breadcrumb-item active text-white">Commande</li>
+		</ol>
+	</div>
+	<div class="container mt-3" id="cardClients">
+		<div class="row text-center mt-4">
+			{% for order in myOrders %}
+				<!-- Team item -->
+				<div class="col-lg-3 col-md-6 col-sm-12 mb-4 animate__animated animate__fadeInLeft">
+					<div class="card h-100 card-hover">
+						<div class="card-body d-flex flex-column">
+							<h5 class="card-title">
+								Ref :
+								{{ order.reference }}</h5>
+							<p class="card-text">
+								<small style="font-size:12px;">{{ order.createdAt|date("Y-m-d H:i A") }}</small>
+							</p>
+							<p class="card-text">Fullame:
+								{{ order.firstName }}
+								{{ order.lastName }}</p>
+							<p class="card-text">Phone :
+								{{ order.phone }}</p>
+							<p class="card-text">Address :
+								{{ order.address }}</p>
+							<p class="card-text pTotal">
+								<b>Total: ${{ order.total }}</b>
+							</p>
+							{% set dateNow = date() %}
+							{% if order.isPaidByCard  %}
+								<span class="btn btn-success">Paid</span>
+								<a class="" href="{{ path('my_order_details', {'id': order.id} ) }}">Voir Details</a>
+							{% elseif order.isPaidByCard != true  and date(dateNow)|date_modify('-1 day') > order.createdAt %}
+								<small>Your order has expired. Please go to the shop to place another order.</small>
+								<a class="btn btn-warning" href="{{ path('products_index')}}">Go to Shop</a>
+								<a class="" href="{{ path('my_order_details', {'id': order.id} ) }}">Voir Details</a>
+							{% else %}
+								<a class="btn btn-info" href="{{ path('process_payment', {'id': order.getId()} ) }}">Waiting payment</a>
+							{% endif %}
+
+						</div>
+					</div>
+				</div>
+			{% endfor %}
+
+
+			<!-- Pagination Controls -->
+			<div class="pagination d-flex justify-content-center mt-5">
+				{{ knp_pagination_render(myOrders) }}
+			</div>
+
+
+		</div>
+	</div>
+
+{% endblock %}
